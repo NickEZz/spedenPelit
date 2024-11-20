@@ -7,6 +7,8 @@
 // loop() function and interrupt handlers
 volatile int buttonNumber = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
+
+
 volatile bool isGameRunning = true;
 unsigned long previousMillis = 0; // Aikaseuranta
 float kerroin = 1; 

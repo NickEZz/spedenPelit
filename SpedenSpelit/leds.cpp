@@ -2,13 +2,16 @@
 
 // Pinit jokaiselle LED
 const int ledPins[] = {A2, A3, A4, A5};
+// button = 2 dp2, 3 = dp3, 4 = dp4, 5 = dp5, 6 = dp6 (startGame)
 
 void initializeLeds()
 {
 // see requirements for this function from leds.h
   for (int i = 0; i < 4; i++) {
     pinMode(ledPins[i], OUTPUT);
-    digitalWrite(ledPins[i], LOW); // Aloitus kaikilla pineillä LOW
+    digitalWrite(ledPins[i], HIGH); // Aloitus kaikilla pineillä HIGH
+    delay(250);
+    clearAllLeds(); // Set them to LOW
   }
 }
 
@@ -19,12 +22,7 @@ void setLed(byte ledNumber)
   if (ledNumber < 4) {
     // Turn on only the specific LED
     digitalWrite(ledPins[ledNumber], HIGH);
-    Serial.print("LED ");
-    Serial.print(ledNumber);
-    Serial.print(" on päällä, pinni: ");
-    Serial.println(ledPins[ledNumber]);
-  } else {
-    Serial.println("Virheellinen LED-numero. Käytä arvoa 0-3.");
+    currentLed = ledNumber;
   }
 }
 
@@ -35,6 +33,7 @@ void clearAllLeds()
   for (int i = 0; i < 4; i++) {
     digitalWrite(ledPins[i], LOW);
   }
+  currentLed = -1;
 }
 
 void setAllLeds()

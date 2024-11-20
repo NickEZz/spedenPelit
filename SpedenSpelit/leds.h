@@ -2,12 +2,19 @@
 #define LEDS_H
 #include <arduino.h>
 
+extern byte currentLed;
+
 /*
   initializeLeds() subroutine intializes analog pins A2,A3,A4,A5
   to be used as outputs. Speden Spelit leds are connected to those
   pins.  
 */
 void initializeLeds();
+
+struct LedStruct
+{
+  int ledPin;
+};
 
 /*
   setLed(byte) sets correct led number given as 0,1,2 or 3
