@@ -46,7 +46,9 @@ void loop()
     
     if (isGameRunning == true){
     // Arvotaan satunnainen numero ja tallennetaan se taulukkoon
+    do {
     randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
+    } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
     Serial.print("Arvottu numero: ");
     showResult(randomNumbers[counter]);
     setLed(randomNumbers[counter]);
