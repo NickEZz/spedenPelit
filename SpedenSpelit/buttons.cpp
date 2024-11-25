@@ -21,10 +21,11 @@ void initButtonsAndButtonInterrupts(void)
 ISR(PCINT2_vect) {
   static unsigned long lastInterruptTime = 0;
   unsigned long currentTime = millis();
-  if (currentTime - lastInterruptTime > 100) {  // Debounce
+  if (currentTime - lastInterruptTime) {
     for (int button = 2; button < 7; button++) {
       if (digitalRead(button) == LOW) {
         buttonNumber = button - 2;
+       
         break;
       }
     }

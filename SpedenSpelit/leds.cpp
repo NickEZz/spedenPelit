@@ -18,11 +18,13 @@ void initializeLeds()
 void setLed(byte ledNumber)
 {
 // see requirements for this function from leds.h
-  clearAllLeds();
+ 
   if (ledNumber < 4) {
     // Turn on only the specific LED
+    clearAllLeds();
     digitalWrite(ledPins[ledNumber], HIGH);
     currentLed = ledNumber;
+    
   }
 }
 

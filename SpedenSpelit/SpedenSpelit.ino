@@ -12,22 +12,33 @@ volatile bool newTimerInterrupt = false;  // for timer interrupt handler
 volatile bool isGameRunning = true;
 unsigned long previousMillis = 0; // Aikaseuranta
 float kerroin = 1; 
-
+unsigned long x = 0;
+const unsigned long y = 700;
 
 int randomNumbers[100];  // Satunnainen taulukko pelin arvotuille numeroille
 int userNumbers[100];    // Käyttäjän syöttämille numeroille
-
 int counter = 0;  // Laskuri, kuinka monta numeroa on arvottu
 int numberCount = 0;  // Laskuri arvottujen numeroiden määrälle
+unsigned long lastLedChange = 0;
+const unsigned ledChangeTimer = 3000; // 3 sec
+int score = 0;
+byte currentLed = -1;
+bool ledChanged = false;
+
 
 void setup(){
  Serial.begin(9600);  // Aloitetaan sarjayhteys 9600 baudilla
   initializeTimer();
- 
+  initializeDisplay();
+  initializeLeds();
+  initButtonsAndButtonInterrupts();
+  interrupts();
 }
 
 void loop()
 {
+  
+  
    // Jos timeri keskeyttää ja uusi numero on arvottu
   if (newTimerInterrupt) {
    
@@ -37,9 +48,10 @@ void loop()
     // Arvotaan satunnainen numero ja tallennetaan se taulukkoon
     randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
     Serial.print("Arvottu numero: ");
-    showResult(counter);
+    showResult(randomNumbers[counter]);
+    setLed(randomNumbers[counter]);
     Serial.println(randomNumbers[counter]);  // Tulostetaan numero sarjamonitoriin
-  
+    
     }
 
   if ( userNumbers !=randomNumbers  ){
