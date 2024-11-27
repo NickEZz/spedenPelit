@@ -9,7 +9,7 @@ volatile int buttonNumber = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
 
 
-volatile bool isGameRunning = true;
+volatile bool isGameRunning = false;
 unsigned long previousMillis = 0; // Aikaseuranta
 float kerroin = 1; 
 unsigned long x = 0;
@@ -37,60 +37,77 @@ void setup(){
 
 void loop()
 {
-  
-  
+  if (buttonNumber == 4){
+      startTheGame();
+     Serial.print("nappi 4");
+      buttonNumber = -1;
+    }
+      if (buttonNumber == 1){
+      Serial.print("nappi 1");
+      buttonNumber = -1;
+    }
+       if (buttonNumber == 2){
+      Serial.print("nappi 2");
+      buttonNumber = -1;
+    }
+     
+       if (buttonNumber == 3){
+      Serial.print("nappi 3");
+      buttonNumber = -1;
+    }
+   if (buttonNumber == 0){
+      Serial.print("nappi 0");
+      buttonNumber = -1;
+    }
    // Jos timeri keskeyttää ja uusi numero on arvottu
   if (newTimerInterrupt) {
    
     newTimerInterrupt = false;  // Nollataan keskeytyslippu
     
-    if (isGameRunning == true){
-    // Arvotaan satunnainen numero ja tallennetaan se taulukkoon
-    do {
-    randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
-    } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
-    Serial.print("Arvottu numero: ");
-    showResult(randomNumbers[counter]);
-    setLed(randomNumbers[counter]);
-    Serial.println(randomNumbers[counter]);  // Tulostetaan numero sarjamonitoriin
-    
+    if (isGameRunning == true)
+    {
+         // Arvotaan satunnainen numero ja tallennetaan se taulukkoon
+           do {
+           randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
+         } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
+           Serial.print("Arvottu numero: ");
+         showResult(randomNumbers[counter]);
+         setLed(randomNumbers[counter]);
+         Serial.println(randomNumbers[counter]);
+                                // Tulostetaan numero sarjamonitoriin
+         
+       }
+     // Päivitetään laskuri ja tarkistetaan, onko 10 numeroa arvottu
+      counter++;   
+      numberCount ++;
+
+
+
+    if (counter == 100){
+      stopTheGame();
     }
-
-  if ( userNumbers !=randomNumbers  ){
-    stopTheGame();
-  }
-
-    
-  // Päivitetään laskuri ja tarkistetaan, onko 10 numeroa arvottu
-    counter++;
-    numberCount++;
-
-    if (numberCount == 10) {
+     if (numberCount == 10) {
       // Kun 10 numeroa on arvottu, nollataan laskuri
       numberCount = 0;
-    }
+     }
 
      if (numberCount % 10 == 0) {
-      // Nopeutetaan timeriä 10 % (mutta ei liian nopeaksi)
+   
       kerroin = kerroin * 0.9;  // Vähennetään aikaväliä 10 %
 
       // Päivitetään timerin väli (keskeytyksen aika)
        updateOCR1A();
       Serial.print("Nopeus kasvoi! Uusi aikaväli: ");
       Serial.println(kerroin);
+     }
+      if ( userNumbers !=randomNumbers  )
+      {
+      //  stopTheGame();
+      }
     }
-  
-  }
 
-
-  if(buttonNumber>=0)
-  {
-     // start the game if buttonNumber == 4
-     // check the game if 0<=buttonNumber<4
-  }
-
-  if(newTimerInterrupt == true)
- {
+    if(newTimerInterrupt == true)
+   {
     //  new random number must be generated
      // and corresponding let must be activated
    }
@@ -108,6 +125,10 @@ void initializeTimer(void){
 ISR(TIMER1_COMPA_vect)
 {
    newTimerInterrupt = true; 
+     if (isGameRunning) {
+        newTimerInterrupt = true;
+    }
+   
 }
 
 void updateOCR1A() {
@@ -128,11 +149,19 @@ void initializeGame()
 }
 
 void startTheGame()
-{
+{ 
+   isGameRunning = true;  
+  Serial.println("Peli aloitettu");
    // see requirements for the function from SpedenSpelit.h
 }
 void stopTheGame()
 {
-   // isGameRunning = false;
+   
+    Serial.println("Peli pysäytetty");
+    counter = 0;
+    numberCount = 0;
+    kerroin = 1; // Palautetaan alkuperäinen nopeus
+    updateOCR1A(); // Päivitetään keskeytys
+    isGameRunning = false;
    // see requirements for the function from SpedenSpelit.h
 }

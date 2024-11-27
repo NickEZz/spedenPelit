@@ -24,7 +24,7 @@ ISR(PCINT2_vect) {
   if (currentTime - lastInterruptTime) {
     for (int button = 2; button < 7; button++) {
       if (digitalRead(button) == LOW) {
-        buttonNumber = button - 2;
+        buttonNumber = button -2 ;
        
         break;
       }
