@@ -42,13 +42,7 @@ void setup(){
 void loop()
 {
 
-  
-  
-  if (buttonNumber == 4){
-      startTheGame();
-     Serial.print("nappi 4");
-      buttonNumber = -1;
-    }
+ 
  if (buttonNumber >= 0) {
     if (buttonNumber == 4) {
         startTheGame();
@@ -61,35 +55,29 @@ void loop()
     }
     buttonNumber = -1; // Nollaa painikemuuttuja välittömästi
 }
-
    // Jos timeri keskeyttää ja uusi numero on arvottu
   if (newTimerInterrupt) {
    
     newTimerInterrupt = false;  // Nollataan keskeytyslippu
     
-    if (isGameRunning == true)
+    if (isGameRunning == true) //katsotaa onko peli päällä
     {
          // Arvotaan satunnainen numero ja tallennetaan se taulukkoon
            do {
            randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
          } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
-        //   Serial.print("Arvottu numero: ");
-       // Serial.println(randomNumbers[counter]);
          showResult(score);
          setLed(randomNumbers[counter]);
-           
-                                // Tulostetaan numero sarjamonitoriin
-         
+    
        }
      // Päivitetään laskuri ja tarkistetaan, onko 10 numeroa arvottu
       counter++;   
       numberCount ++;
-
-
-
+    /*
     if (counter == 100){
       stopTheGame();
     }
+    */
      if (numberCount == 10) {
       // Kun 10 numeroa on arvottu, nollataan laskuri
       numberCount = 0;
@@ -104,18 +92,8 @@ void loop()
       Serial.print("Nopeus kasvoi! Uusi aikaväli: ");
       Serial.println(kerroin);
      }
-      if ( userNumbers !=randomNumbers  )
-      {
-      //  stopTheGame();
-      }
+    
     }
-
-    if(newTimerInterrupt == true)
-   {
-    //  new random number must be generated
-     // and corresponding let must be activated
-   }
-
 }
 
 void initializeTimer(void){
@@ -129,17 +107,9 @@ void initializeTimer(void){
 ISR(TIMER1_COMPA_vect)
 {
    newTimerInterrupt = true; 
-    // if (isGameRunning) {
-   //     newTimerInterrupt = true;
-      
-    //}
-   
 }
-
 void updateOCR1A() {
-  
-  OCR1A = (16000000 / 1024)*kerroin - 1;
-
+  OCR1A = (16000000 / 1024)*kerroin - 1; //säädetään pelin nopeus
 }
 void checkGame(byte nbrOfButtonPush)
 {
@@ -154,21 +124,15 @@ void checkGame(byte nbrOfButtonPush)
     } else {
         // Jos numerot eivät täsmää
         Serial.println("Väärä numero.");
+        stopTheGame();
+
     }
-
-   
- 
 }
-
-
-void initializeGame()
-{
-	// see requirements for the function from SpedenSpelit.h
-}
-
 void startTheGame()
 { 
+  delay(100);
    isGameRunning = true;  
+   score = 0;
    kerroin = 1; // Nollataan kerroin
    counter = 0; // Nollataan laskuri
    userCounter = 0; // Nollataan käyttäjän laskuri
@@ -188,6 +152,7 @@ void stopTheGame()
     userCounter = 0; // Nollataan käyttäjän laskuri
     updateOCR1A(); // Päivitetään keskeytys
     clearAllLeds();
+    setAllLeds();
     isGameRunning = false;
    // see requirements for the function from SpedenSpelit.h
 }
