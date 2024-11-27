@@ -41,6 +41,9 @@ void setup(){
 
 void loop()
 {
+
+  
+  
   if (buttonNumber == 4){
       startTheGame();
      Serial.print("nappi 4");
@@ -54,6 +57,7 @@ void loop()
         Serial.print("Käyttäjän numero: ");
         Serial.println(userNumbers[userCounter]);
         userCounter++;
+        checkGame(userNumbers[userCounter - 1]);
     }
     buttonNumber = -1; // Nollaa painikemuuttuja välittömästi
 }
@@ -70,9 +74,10 @@ void loop()
            randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
          } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
         //   Serial.print("Arvottu numero: ");
-         showResult(randomNumbers[counter]);
+       // Serial.println(randomNumbers[counter]);
+         showResult(score);
          setLed(randomNumbers[counter]);
-         //  Serial.println(randomNumbers[counter]);
+           
                                 // Tulostetaan numero sarjamonitoriin
          
        }
@@ -138,7 +143,20 @@ void updateOCR1A() {
 }
 void checkGame(byte nbrOfButtonPush)
 {
-	// see requirements for the function from SpedenSpelit.h
+	 if (userCounter > 0 && userNumbers[userCounter - 1] == randomNumbers[userCounter - 1]) {
+        // Jos käyttäjän syöttämä numero on oikea
+        score++;  // Lisää pisteitä
+        Serial.print("Oikea numero! Pisteet: ");
+        Serial.println(score);
+
+        // Voit halutessasi tehdä muita toimenpiteitä, kuten ledin vilkuttaminen
+       
+    } else {
+        // Jos numerot eivät täsmää
+        Serial.println("Väärä numero.");
+    }
+
+   
  
 }
 
