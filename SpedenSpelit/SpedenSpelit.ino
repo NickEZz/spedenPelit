@@ -73,11 +73,11 @@ void loop()
      // Päivitetään laskuri ja tarkistetaan, onko 10 numeroa arvottu
       counter++;   
       numberCount ++;
-    /*
-    if (counter == 100){
+    
+    if (score == 99){
       stopTheGame();
     }
-    */
+    
      if (numberCount == 10) {
       // Kun 10 numeroa on arvottu, nollataan laskuri
       numberCount = 0;
