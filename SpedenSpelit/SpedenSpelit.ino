@@ -66,25 +66,16 @@ void loop()
            do {
            randomNumbers[counter] = random(0, 4);  // Arvotaan numero 0-3
          } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
-         showResult(score);
+         
          setLed(randomNumbers[counter]);
-    
+    numberCount ++;
        }
      // Päivitetään laskuri ja tarkistetaan, onko 10 numeroa arvottu
       counter++;   
-      numberCount ++;
-    
-    if (score == 99){
-      stopTheGame();
-    }
-    
-     if (numberCount == 10) {
-      // Kun 10 numeroa on arvottu, nollataan laskuri
-      numberCount = 0;
-     }
+      
 
-     if (numberCount % 10 == 0) {
-   
+     if (numberCount == 10) {
+     numberCount = 0;
       kerroin = kerroin * 0.9;  // Vähennetään aikaväliä 10 %
 
       // Päivitetään timerin väli (keskeytyksen aika)
@@ -92,7 +83,9 @@ void loop()
       Serial.print("Nopeus kasvoi! Uusi aikaväli: ");
       Serial.println(kerroin);
      }
-    
+     if (score == 99){
+      stopTheGame();
+    }
     }
 }
 
@@ -118,6 +111,7 @@ void checkGame(byte nbrOfButtonPush)
         score++;  // Lisää pisteitä
         Serial.print("Oikea numero! Pisteet: ");
         Serial.println(score);
+        showResult(score);
 
         // Voit halutessasi tehdä muita toimenpiteitä, kuten ledin vilkuttaminen
        
