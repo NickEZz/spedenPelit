@@ -22,35 +22,45 @@ int numberCount = 0;  // Laskuri arvottujen numeroiden määrälle
 int userCounter = 0; // Laskuri, käyttäjän painamille numeroille
 
 
-
 unsigned long lastLedChange = 0;
 const unsigned ledChangeTimer = 3000; // 3 sec
 int score = 0;
+int highScore = 0;
 byte currentLed = -1;
 bool ledChanged = false;
 
 
 void setup(){
- Serial.begin(9600);  // Aloitetaan sarjayhteys 9600 baudilla
+  Serial.begin(9600);  // Aloitetaan sarjayhteys 9600 baudilla
   initializeTimer();
   initializeDisplay();
+
+
+isGameRunning = false;
   initializeLeds();
-  initButtonsAndButtonInterrupts();
+  initButtonsAndButtonInterrupts(); // suorittaa nappien inilizaation
   interrupts();
 }
 
 void loop()
 {
+  
+  if(!isGameRunning){
+      
+    Serial.println("korkein score on:");
+    Serial.println(highScore);
+    showResult(highScore);
+  
+  }
 
- 
- if (buttonNumber >= 0) {
-    if (buttonNumber == 4) {
+ if (buttonNumber >= 0) {// jos buttonNumber on yli 0 suoritetaan if lause
+    if (buttonNumber == 4) {//jos ButtonNumber on 4 eli painetaan nappia 6 niin aloitetaan peli
         startTheGame();
     } else if (isGameRunning && userCounter < 100) {
-        userNumbers[userCounter] = buttonNumber;
+        userNumbers[userCounter] = buttonNumber;//tallentaa napin painalluksen taulukkoon
         Serial.print("Käyttäjän numero: ");
         Serial.println(userNumbers[userCounter]);
-        userCounter++;
+        userCounter++;//menee taulukossa yhden eteenpäin
         checkGame(userNumbers[userCounter - 1]);
     }
     buttonNumber = -1; // Nollaa painikemuuttuja välittömästi
@@ -68,14 +78,15 @@ void loop()
          } while (counter > 0 && randomNumbers[counter] == randomNumbers[counter - 1]);
          
          setLed(randomNumbers[counter]);
-    numberCount ++;
+         Serial.println(randomNumbers[counter]);
+      numberCount ++;
        }
      // Päivitetään laskuri ja tarkistetaan, onko 10 numeroa arvottu
       counter++;   
       
 
      if (numberCount == 10) {
-     numberCount = 0;
+      numberCount = 0;
       kerroin = kerroin * 0.9;  // Vähennetään aikaväliä 10 %
 
       // Päivitetään timerin väli (keskeytyksen aika)
@@ -84,6 +95,7 @@ void loop()
       Serial.println(kerroin);
      }
      if (score == 99){
+      highScore = score;
       stopTheGame();
     }
     }
@@ -118,8 +130,11 @@ void checkGame(byte nbrOfButtonPush)
     } else {
         // Jos numerot eivät täsmää
         Serial.println("Väärä numero.");
+        if(score > highScore){
+          highScore = score;
+        }
         stopTheGame();
-
+        
     }
 }
 void startTheGame()
@@ -138,7 +153,9 @@ void startTheGame()
 }
 void stopTheGame()
 {
-   
+ if (score > highScore) {
+        highScore = score;
+    }   
     Serial.println("Peli pysäytetty");
     counter = 0;
     numberCount = 0;

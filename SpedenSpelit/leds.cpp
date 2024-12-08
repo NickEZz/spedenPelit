@@ -1,77 +1,68 @@
 #include "leds.h"
 
-// Pinit jokaiselle LED
-const int ledPins[] = {A2, A3, A4, A5};
-// button = 2 dp2, 3 = dp3, 4 = dp4, 5 = dp5, 6 = dp6 (startGame)
+// LEDien liitäntäpinnit
+const int ledPins[] = {A2, A3, A4, A5}; // LEDien pinniarvot taulukossa
 
+// Alustaa kaikki LEDit
 void initializeLeds()
 {
-// see requirements for this function from leds.h
-  for (int i = 0; i < 4; i++) {
-    pinMode(ledPins[i], OUTPUT);
-    digitalWrite(ledPins[i], HIGH); // Aloitus kaikilla pineillä HIGH
-    delay(250);
-    clearAllLeds(); // Set them to LOW
+  for (int i = 0; i < 4; i++) { // Käy läpi kaikki LEDien pinnit
+    pinMode(ledPins[i], OUTPUT); // Määritä pinni ulostuloksi
+    digitalWrite(ledPins[i], HIGH); // Aseta LED tilaan HIGH (syttyy hetkeksi)
+    delay(250); // Viive näkyvyyden parantamiseksi
+    clearAllLeds();
   }
 }
 
+// Sytyttää tietyn LEDin
 void setLed(byte ledNumber)
 {
-// see requirements for this function from leds.h
- 
-  if (ledNumber < 4) {
-    // Turn on only the specific LED
+  if (ledNumber < 4) { // Varmista, että LED-numero on validi
     clearAllLeds();
-    digitalWrite(ledPins[ledNumber], HIGH);
-    currentLed = ledNumber;
-    
+    digitalWrite(ledPins[ledNumber], HIGH); // Sytytä haluttu LED
+    currentLed = ledNumber; // Päivitä aktiivinen LED
   }
 }
 
-
+// Sammuttaa kaikki LEDit
 void clearAllLeds()
 {
-// see requirements for this function from leds.h
-  for (int i = 0; i < 4; i++) {
-    digitalWrite(ledPins[i], LOW);
+  for (int i = 0; i < 4; i++) { // Käy läpi kaikki LEDien pinnit
+    digitalWrite(ledPins[i], LOW); // Sammuta jokainen LED
   }
-  currentLed = -1;
+  currentLed = -1; // Ei aktiivista LEDiä
 }
 
+// Sytyttää kaikki LEDit samanaikaisesti
 void setAllLeds()
 {
-// see requirements for this function from leds.h
-  for (int i = 0; i < 4; i++) {
-    digitalWrite(ledPins[i], HIGH);
+  for (int i = 0; i < 4; i++) { // Käy läpi kaikki LEDien pinnit
+    digitalWrite(ledPins[i], HIGH); // Sytytä jokainen LED
   }
 }
 
-
+// Näyttää LEDeillä binäärilukuja (0–15)
 void show1()
 {
-// see requirements for this function from leds.h
-  for (int num = 0; num < 16; num++) {
-      for (int i = 0; i < 4; i++) {
-        // Set LED according to binary of num
-        digitalWrite(ledPins[i], (num & (1 << i)) ? HIGH : LOW);
+  for (int num = 0; num < 16; num++) { // Binäärinumerot 0–15
+      for (int i = 0; i < 4; i++) { // Jokainen LED edustaa yhtä bittiä
+        digitalWrite(ledPins[i], (num & (1 << i)) ? HIGH : LOW); // Aseta bittiä vastaava tila
       }
-      delay(250); // Small delay to make binary number recognizable
+      delay(250); // Viive, jotta numero näkyy selvästi
   }
 }
 
+// Näyttää "pyörivän" efektin LEDeillä usean kierroksen ajan
 void show2(int rounds)
 {
-// see requirements for this function from leds.h
-  int delayTime = 500;
-  for (int r = 0; r < rounds; r++) {
-      for (int i = 0; i < 4; i++) {
-        digitalWrite(ledPins[i], HIGH);
-        delay(delayTime);
-        // Reduce delay to speed up, minimum delay 50 ms
-        delayTime = max(50, delayTime - 50);
+  int delayTime = 500; // Alkuviive
+  for (int r = 0; r < rounds; r++) { // Kierrokset
+      for (int i = 0; i < 4; i++) { // Sytytä LEDit yksi kerrallaan
+        digitalWrite(ledPins[i], HIGH); // Sytytä yksi LED
+        delay(delayTime); // Viive ennen seuraavaa LEDiä
+        delayTime = max(50, delayTime - 50); // Pienennä viivettä, mutta älä alle 50 ms
       }
-      // Tyhjennä ledit ennen seuraavaa erää
       clearAllLeds();
-      delay(200);
+      delay(200); // Lyhyt tauko ennen seuraavaa kierrosta
   }
 }
