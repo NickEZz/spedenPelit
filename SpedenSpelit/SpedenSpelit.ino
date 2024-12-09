@@ -1,3 +1,4 @@
+#include <EEPROM.h> //Uno, Mega ja Nano, on sisäänrakennettu EEPROM
 #include "display.h"
 #include "buttons.h"
 #include "leds.h"
@@ -7,7 +8,6 @@
 // loop() function and interrupt handlers
 volatile int buttonNumber = -1;           // for buttons interrupt handler
 volatile bool newTimerInterrupt = false;  // for timer interrupt handler
-
 
 volatile bool isGameRunning = false;
 unsigned long previousMillis = 0; // Aikaseuranta
@@ -24,22 +24,27 @@ int userCounter = 0; // Laskuri, käyttäjän painamille numeroille
 
 unsigned long lastLedChange = 0;
 const unsigned ledChangeTimer = 3000; // 3 sec
-int score = 0;
-int highScore = 0;
+byte score = 0;
+byte highScore = 0;
 byte currentLed = -1;
 bool ledChanged = false;
 
 
 void setup(){
+  delay(500); //vakaatuminen
   Serial.begin(9600);  // Aloitetaan sarjayhteys 9600 baudilla
   initializeTimer();
   initializeDisplay();
 
 
-isGameRunning = false;
+  isGameRunning = false;
   initializeLeds();
   initButtonsAndButtonInterrupts(); // suorittaa nappien inilizaation
   interrupts();
+
+  // EEPROM
+  highScore = loadHighScore();
+  Serial.println(highScore);
 }
 
 void loop()
@@ -47,8 +52,8 @@ void loop()
   
   if(!isGameRunning){
       
-    Serial.println("korkein score on:");
-    Serial.println(highScore);
+ //   Serial.println("korkein score on:");
+//    Serial.println(highScore);
     showResult(highScore);
   
   }
@@ -129,10 +134,7 @@ void checkGame(byte nbrOfButtonPush)
        
     } else {
         // Jos numerot eivät täsmää
-        Serial.println("Väärä numero.");
-        if(score > highScore){
-          highScore = score;
-        }
+      
         stopTheGame();
         
     }
@@ -155,7 +157,9 @@ void stopTheGame()
 {
  if (score > highScore) {
         highScore = score;
+        saveHighScore(highScore);
     }   
+   
     Serial.println("Peli pysäytetty");
     counter = 0;
     numberCount = 0;
@@ -166,4 +170,17 @@ void stopTheGame()
     setAllLeds();
     isGameRunning = false;
    // see requirements for the function from SpedenSpelit.h
+}
+void saveHighScore(byte highScore){
+  Serial.print("Tallennetaan EEPROM:iin: ");
+  Serial.println(highScore);
+  EEPROM.update(0, highScore);// Voi valita kumpaa käyttää, update vois olla parempi
+ // Päivitä muuttuja jos arvo muuttunut
+  //EEPROM.put(0, highScore); // Tallenetaan highScore 0 osotteeseen
+}
+byte loadHighScore() {
+  byte storedHighScore = EEPROM.read(0); 
+  Serial.print("Ladattu EEPROM:sta: ");
+  Serial.println(storedHighScore);
+  return storedHighScore;
 }

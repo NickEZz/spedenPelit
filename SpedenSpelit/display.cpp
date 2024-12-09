@@ -16,34 +16,29 @@ const byte numero_segmentit[] = { // Järjestys abcdefg ja viimeisenä dp, joka 
 
 void initializeDisplay(void)
 {
-  for(int i = 8; i<=12; i++){ //Initialisoidaan tarvittavat pinit outputeiksi
-    pinMode(i, OUTPUT);
-  }
-  digitalWrite(12, LOW); //Tyhjennetään sarjaväylä datasta
-  digitalWrite(12, HIGH);
-  digitalWrite(9, LOW); //Output enable on aktiivinen LOW
+  DDRB |= 0b00011111;
+  PORTB &= ~(1 << PB4);  //Tyhjennetään sarjaväylä datasta varalta.
+  PORTB |= (1 << PB4);
+  PORTB &= ~(1<<PB1); //Output enable on aktiivinen LOW
 }
 
 
 void WriteByte(uint8_t number, bool last) {
-  
-  byte numeronKuvio = numero_segmentit[number]; //Haetaan oikean numeron kuvio numero_segmentit taulukosta.
 
-  
-  for (int i = 0; i < 8; i++) { //Käydään bitti kerrallaan läpi, digitalWrite 1 = HIGH ja 0 = LOW
-    digitalWrite(8, numeronKuvio & 1); //Irroitetaan LSB ja välitetään se sajraväylään. numeronKuvio & 0b00000001 = LSB.
-    numeronKuvio >>= 1;  //Siirretään bittejä kerran oikealle, että saadaan seuraava bitti LSB kohdalle.
-    digitalWrite(11, HIGH); //Kellopulssi sarjaväylän etenemiseksi.
-    digitalWrite(11, LOW);
+  byte numeronKuvio = numero_segmentit[number];  //Haetaan oikean numeron kuvio numero_segments taulukosta.
+
+  for (int i = 0; i < 8; i++) {         //Käydään bitti kerrallaan läpi.
+
+    PORTB = (PORTB & ~(1 << PB0)) | ((numeronKuvio & 1) << PB0); // Tyhjennetään PB0 ja lisätään numeronKuvio LSB.
+    numeronKuvio >>= 1; //Siirretään bittejä kerran oikealle.
+    PORTB |= (1 << PB3); //Kellopulssi sarjaväylän etenemiseksi.
+    PORTB &= ~(1 << PB3);
   }
-
-
   if (last) {
-    digitalWrite(10, HIGH); //Latchataan data outputteihin.
-    digitalWrite(10, LOW);
-    //digitalWrite(9, LOW);  
-    digitalWrite(12, LOW); //Resetoidaan sarjaväylästä numerot pois, että ne eivät siirry seuraavaan näyttöön.
-    digitalWrite(12, HIGH);
+    PORTB |= (1 << PB2); //Latchataan data outputteihin.
+    PORTB &= ~(1 << PB2);
+    PORTB &= ~(1 << PB4); //Resetoidaan sarjaväylästä numerot pois, että ne eivät siirry seuraavaan näyttöön.
+    PORTB |= (1 << PB4);
 
   }
 }
